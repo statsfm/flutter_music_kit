@@ -28,7 +28,13 @@ extension SwiftMusicKitPlugin {
         let token = try await MusicUserTokenProvider().userToken(for: developerToken, options: MusicTokenRequestOptions.ignoreCache)
         result(token)
       } catch {
-        result(FlutterError(code: kErrorRequestUserToken, message: error.localizedDescription))
+        if (error is MusicTokenRequestError) {
+          //TODO: Make a custom enum for Flutter to use
+          let requestError: MusicTokenRequestError = error as! MusicTokenRequestError;
+          result(FlutterError(code: "ERR_MUSICKIT_USER_TOKEN", message: requestError.rawValue))
+        } else {
+          result(FlutterError(code: kErrorRequestUserToken, message: error.localizedDescription)) 
+        }
       }
     }
   }
